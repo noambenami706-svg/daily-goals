@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="icon.png" />
   <title>המטרות שלי</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -20,51 +20,67 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
     }
 
-    .safe-top { height: env(safe-area-inset-top); }
-    .safe-bottom { height: env(safe-area-inset-bottom); }
-
+    /* ── HEADER ── */
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      padding: 28px 28px 20px;
+      padding: calc(env(safe-area-inset-top) + 24px) 24px 20px;
       border-bottom: 1px solid #f0f0f0;
     }
 
-    .date { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-    .progress { font-size: 15px; color: #aaa; font-weight: 500; }
+    .greeting {
+      font-size: 13px;
+      color: #aaa;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      margin-bottom: 4px;
+    }
 
-    main {
-      flex: 1;
-      padding: 20px 28px 12px;
-      overflow-y: auto;
+    .greeting strong { color: #111; font-weight: 700; }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .date { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; color: #111; }
+
+    .history-btn {
+      background: none;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 13px;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .history-btn:active { background: #f5f5f5; }
+
+    /* ── MAIN ── */
+    main { flex: 1; padding: 20px 24px 8px; overflow-y: auto; }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #bbb;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
     }
 
     .goal-row {
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
-      gap: 14px;
+      margin-bottom: 18px;
+      gap: 12px;
+      direction: rtl;
     }
-
-    .checkbox {
-      width: 24px;
-      height: 24px;
-      min-width: 24px;
-      border: 2px solid #111;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background 0.15s;
-      flex-shrink: 0;
-    }
-
-    .checkbox.done { background: #111; }
-    .checkbox.done::after { content: '✓'; color: #fff; font-size: 14px; font-weight: 700; }
 
     input[type="text"] {
       flex: 1;
@@ -76,85 +92,262 @@
       text-align: right;
       font-family: inherit;
       padding: 4px 0;
+      min-width: 0;
     }
+    input[type="text"]::placeholder { color: #ddd; }
+    input[type="text"].done { color: #c0c0c0; text-decoration: line-through; }
 
-    input[type="text"]::placeholder { color: #ccc; }
-    input[type="text"].done { color: #bbb; text-decoration: line-through; }
+    .checkbox {
+      width: 26px;
+      height: 26px;
+      min-width: 26px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .checkbox.done { background: #111; border-color: #111; }
+    .checkbox.done::after { content: '✓'; color: #fff; font-size: 13px; font-weight: 800; }
+    .checkbox:not(.done):active { border-color: #aaa; }
 
     .delete-btn {
       background: none;
       border: none;
-      color: #ddd;
-      font-size: 18px;
+      color: #e0e0e0;
+      font-size: 16px;
       cursor: pointer;
       padding: 4px;
       line-height: 1;
-      display: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
     }
+    .goal-row:focus-within .delete-btn { opacity: 1; }
+    .goal-row.min-goal .delete-btn { display: none; }
 
-    .goal-row:focus-within .delete-btn { display: block; }
-    .goal-row.min-goal:focus-within .delete-btn { display: none; }
+    .divider { height: 1px; background: #f5f5f5; margin: 8px 0 20px; }
 
-    footer {
-      padding: 12px 28px 24px;
+    /* ── RESET CLOCK ── */
+    .reset-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: #fafafa;
+      border-radius: 12px;
+      margin-bottom: 12px;
     }
+    .reset-label { font-size: 12px; color: #bbb; font-weight: 500; }
+    .reset-clock { font-size: 22px; font-weight: 700; color: #111; letter-spacing: 1px; font-variant-numeric: tabular-nums; }
+    .reset-sub { font-size: 10px; color: #ccc; margin-top: 2px; text-align: left; }
+
+    /* ── PROGRESS ── */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .progress-bar-wrap { flex: 1; height: 3px; background: #f0f0f0; border-radius: 99px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #111; border-radius: 99px; transition: width 0.3s ease; }
+    .progress-text { font-size: 13px; color: #bbb; font-weight: 500; min-width: 32px; text-align: left; }
+
+    /* ── FOOTER ── */
+    footer { padding: 8px 24px calc(env(safe-area-inset-bottom) + 20px); }
 
     .add-btn {
       width: 100%;
       padding: 14px;
-      border: 1.5px solid #e0e0e0;
+      border: 1.5px solid #ebebeb;
       border-radius: 12px;
       background: #fff;
-      color: #aaa;
+      color: #ccc;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       font-family: inherit;
-      transition: border-color 0.15s;
+      transition: all 0.15s;
+    }
+    .add-btn:active { border-color: #ccc; color: #999; }
+
+    /* ── HISTORY OVERLAY ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .history-panel {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      z-index: 11;
+      padding: 0 0 env(safe-area-inset-bottom);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      max-height: 80dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    .history-panel.open { transform: translateY(0); }
+
+    .panel-handle {
+      width: 36px; height: 4px;
+      background: #e0e0e0;
+      border-radius: 99px;
+      margin: 12px auto 0;
+      flex-shrink: 0;
     }
 
-    .add-btn:active { border-color: #bbb; }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .panel-title { font-size: 18px; font-weight: 700; }
+    .close-btn {
+      background: #f0f0f0;
+      border: none;
+      border-radius: 99px;
+      width: 28px; height: 28px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #888;
+    }
+
+    .history-list { overflow-y: auto; padding: 8px 0; }
+
+    .history-day {
+      padding: 14px 24px;
+      border-bottom: 1px solid #f8f8f8;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .history-day:active { background: #fafafa; }
+    .history-day-header { display: flex; justify-content: space-between; align-items: center; }
+    .history-date { font-size: 15px; font-weight: 600; color: #111; }
+    .history-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+    .badge-done { background: #111; color: #fff; }
+    .badge-partial { background: #f0f0f0; color: #888; }
+    .history-goals-preview { margin-top: 6px; }
+    .history-goal-item {
+      font-size: 13px;
+      color: #aaa;
+      padding: 2px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .history-goal-item.done-item { color: #ccc; text-decoration: line-through; }
+    .mini-check { font-size: 10px; }
+
+    /* day detail inside panel */
+    .back-btn {
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #888;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+    }
   </style>
 </head>
 <body>
-  <div class="safe-top"></div>
 
   <header>
-    <span class="date" id="dateDisplay"></span>
-    <span class="progress" id="progressDisplay"></span>
+    <div class="greeting" id="greeting"></div>
+    <div class="header-row">
+      <span class="date" id="dateDisplay"></span>
+      <button class="history-btn" onclick="openHistory()">יומן ←</button>
+    </div>
   </header>
 
-  <main id="goalsList"></main>
+  <main>
+    <div class="progress-row">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <span class="progress-text" id="progressText"></span>
+    </div>
+
+    <div class="section-label">המטרות שלי להיום</div>
+    <div id="goalsList"></div>
+
+    <div class="divider"></div>
+
+    <div class="reset-section">
+      <div>
+        <div class="reset-label">המטרות מתאפסות בעוד</div>
+        <div class="reset-sub">חדש כל יום בחצות</div>
+      </div>
+      <div class="reset-clock" id="resetClock">00:00:00</div>
+    </div>
+  </main>
 
   <footer>
     <button class="add-btn" onclick="addGoal()">+ הוסף מטרה</button>
   </footer>
 
-  <div class="safe-bottom"></div>
+  <!-- History overlay -->
+  <div class="overlay" id="overlay" onclick="closeHistory()"></div>
+  <div class="history-panel" id="historyPanel">
+    <div class="panel-handle"></div>
+    <div class="panel-header">
+      <span class="panel-title" id="panelTitle">יומן</span>
+      <button class="close-btn" onclick="closeHistory()">✕</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
 
   <script>
     const STORAGE_KEY = 'goals_data';
+    const NAME = 'נועם';
 
     const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
     const MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 
-    function todayKey() {
-      return new Date().toISOString().slice(0, 10);
-    }
+    function todayKey() { return new Date().toISOString().slice(0,10); }
 
-    function formatDate() {
-      const d = new Date();
+    function formatDate(dateStr) {
+      const d = dateStr ? new Date(dateStr + 'T12:00:00') : new Date();
       return `יום ${DAYS[d.getDay()]}, ${d.getDate()} ב${MONTHS[d.getMonth()]}`;
     }
 
+    function getGreeting() {
+      const h = new Date().getHours();
+      const n = `<strong style="color:#800000">${NAME}</strong>`;
+      if (h >= 5 && h < 12) return `בוקר טוב, ${n}`;
+      if (h >= 12 && h < 17) return `צהריים טובים, ${n}`;
+      if (h >= 17 && h < 22) return `ערב טוב, ${n}`;
+      return `לילה טוב, ${n}`;
+    }
+
+    function loadAllData() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+    }
+
     function loadGoals() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return defaultGoals();
-        const all = JSON.parse(raw);
-        const today = all[todayKey()];
-        return (today && today.length > 0) ? today : defaultGoals();
-      } catch { return defaultGoals(); }
+      const all = loadAllData();
+      const today = all[todayKey()];
+      return (today && today.length > 0) ? today : defaultGoals();
     }
 
     function defaultGoals() {
@@ -165,24 +358,26 @@
       ];
     }
 
-    function saveGoals(goals) {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const all = raw ? JSON.parse(raw) : {};
-        all[todayKey()] = goals;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-      } catch {}
+    function saveGoals(g) {
+      const all = loadAllData();
+      all[todayKey()] = g;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
     }
 
     let goals = loadGoals();
 
     function render() {
+      document.getElementById('greeting').innerHTML =
+        getGreeting() + ' — אלה המטרות שלך להיום';
       document.getElementById('dateDisplay').textContent = formatDate();
 
       const withText = goals.filter(g => g.text.trim());
-      const done = withText.filter(g => g.done);
-      const prog = document.getElementById('progressDisplay');
-      prog.textContent = withText.length > 0 ? `${done.length}/${withText.length}` : '';
+      const doneCount = withText.filter(g => g.done).length;
+      const total = withText.length;
+      const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = total > 0 ? `${doneCount}/${total}` : '';
 
       const list = document.getElementById('goalsList');
       list.innerHTML = '';
@@ -190,10 +385,6 @@
       goals.forEach((goal, index) => {
         const row = document.createElement('div');
         row.className = 'goal-row' + (index < 3 ? ' min-goal' : '');
-
-        const checkbox = document.createElement('div');
-        checkbox.className = 'checkbox' + (goal.done ? ' done' : '');
-        checkbox.onclick = () => toggleDone(goal.id);
 
         const input = document.createElement('input');
         input.type = 'text';
@@ -203,45 +394,51 @@
         input.oninput = e => updateText(goal.id, e.target.value);
         input.addEventListener('keydown', e => {
           if (e.key === 'Enter') {
-            const next = list.querySelectorAll('input')[index + 1];
-            if (next) next.focus();
+            const inputs = list.querySelectorAll('input');
+            const next = inputs[index + 1];
+            if (next) next.focus(); else addGoal();
           }
         });
 
+        const checkbox = document.createElement('div');
+        checkbox.className = 'checkbox' + (goal.done ? ' done' : '');
+        checkbox.onclick = () => toggleDone(goal.id);
+
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = '✕';
+        deleteBtn.innerHTML = '✕';
         deleteBtn.onclick = () => removeGoal(goal.id);
 
-        row.appendChild(checkbox);
-        row.appendChild(input);
+        // RTL order: delete | input | checkbox
         row.appendChild(deleteBtn);
+        row.appendChild(input);
+        row.appendChild(checkbox);
         list.appendChild(row);
       });
     }
 
     function toggleDone(id) {
       goals = goals.map(g => g.id === id ? { ...g, done: !g.done } : g);
-      saveGoals(goals);
-      render();
+      saveGoals(goals); render();
     }
 
     function updateText(id, text) {
       goals = goals.map(g => g.id === id ? { ...g, text } : g);
       saveGoals(goals);
       const withText = goals.filter(g => g.text.trim());
-      const done = withText.filter(g => g.done);
-      const prog = document.getElementById('progressDisplay');
-      prog.textContent = withText.length > 0 ? `${done.length}/${withText.length}` : '';
+      const doneCount = withText.filter(g => g.done).length;
+      const total = withText.length;
+      const pct = total > 0 ? Math.round(doneCount / total * 100) : 0;
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressText').textContent = total > 0 ? `${doneCount}/${total}` : '';
     }
 
     function addGoal() {
       const newGoal = { id: Date.now().toString(), text: '', done: false };
       goals = [...goals, newGoal];
-      saveGoals(goals);
-      render();
+      saveGoals(goals); render();
       setTimeout(() => {
-        const inputs = document.querySelectorAll('input[type="text"]');
+        const inputs = document.querySelectorAll('#goalsList input');
         inputs[inputs.length - 1]?.focus();
       }, 50);
     }
@@ -249,11 +446,111 @@
     function removeGoal(id) {
       if (goals.length <= 3) return;
       goals = goals.filter(g => g.id !== id);
-      saveGoals(goals);
-      render();
+      saveGoals(goals); render();
     }
 
+    // ── RESET CLOCK ──
+    function updateClock() {
+      const now = new Date();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight - now;
+      const h = String(Math.floor(diff / 3600000)).padStart(2, '0');
+      const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+      const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+      document.getElementById('resetClock').textContent = `${h}:${m}:${s}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── HISTORY ──
+    let historyMode = 'list'; // 'list' | 'day'
+
+    function openHistory() {
+      historyMode = 'list';
+      renderHistoryList();
+      document.getElementById('overlay').classList.add('open');
+      document.getElementById('historyPanel').classList.add('open');
+    }
+
+    function closeHistory() {
+      document.getElementById('overlay').classList.remove('open');
+      document.getElementById('historyPanel').classList.remove('open');
+    }
+
+    function renderHistoryList() {
+      document.getElementById('panelTitle').textContent = 'יומן';
+      const all = loadAllData();
+      const keys = Object.keys(all)
+        .filter(k => k !== todayKey() && all[k].some(g => g.text.trim()))
+        .sort((a, b) => b.localeCompare(a));
+
+      const container = document.getElementById('historyList');
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div style="padding:40px 24px;text-align:center;color:#ccc;font-size:15px;">עדיין אין היסטוריה</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      keys.forEach(key => {
+        const dayGoals = all[key].filter(g => g.text.trim());
+        const doneCount = dayGoals.filter(g => g.done).length;
+        const allDone = doneCount === dayGoals.length && dayGoals.length > 0;
+
+        const div = document.createElement('div');
+        div.className = 'history-day';
+        div.onclick = () => renderDayDetail(key);
+
+        const badge = `<span class="history-badge ${allDone ? 'badge-done' : 'badge-partial'}">${doneCount}/${dayGoals.length}</span>`;
+        const preview = dayGoals.slice(0, 3).map(g =>
+          `<div class="history-goal-item ${g.done ? 'done-item' : ''}">
+            <span class="mini-check">${g.done ? '✓' : '○'}</span>${g.text}
+          </div>`
+        ).join('');
+
+        div.innerHTML = `
+          <div class="history-day-header">
+            <span class="history-date">${formatDate(key)}</span>
+            ${badge}
+          </div>
+          <div class="history-goals-preview">${preview}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderDayDetail(key) {
+      const all = loadAllData();
+      const dayGoals = (all[key] || []).filter(g => g.text.trim());
+      document.getElementById('panelTitle').innerHTML =
+        `<button class="back-btn" onclick="renderHistoryList()">← חזור</button>`;
+
+      const container = document.getElementById('historyList');
+      container.innerHTML = `
+        <div style="padding:16px 24px 8px">
+          <div style="font-size:17px;font-weight:700;margin-bottom:16px">${formatDate(key)}</div>
+          ${dayGoals.map(g => `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;direction:rtl">
+              <div style="flex:1;font-size:16px;color:${g.done ? '#ccc' : '#111'};text-decoration:${g.done ? 'line-through' : 'none'}">${g.text}</div>
+              <div style="width:24px;height:24px;border-radius:7px;border:2px solid ${g.done ? '#111' : '#ddd'};background:${g.done ? '#111' : 'transparent'};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800">${g.done ? '✓' : ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // ── NOTIFICATIONS ──
+    async function requestNotifications() {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+    }
+
+    // ── INIT ──
     render();
+    requestNotifications();
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
